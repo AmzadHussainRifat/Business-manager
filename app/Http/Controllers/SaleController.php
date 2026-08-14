@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Customer;
 use App\Models\Product;
 use App\Models\Sale;
 use App\Models\SaleItem;
@@ -88,8 +89,18 @@ class SaleController extends Controller
 
             $total = $subtotal - $discountAmount;
 
+            $customerId = null;
+            if (! empty($validated['customer_phone'])) {
+                $customer = Customer::firstOrCreate(
+                    ['phone' => $validated['customer_phone']],
+                    ['name' => $validated['customer_name'] ?? 'Walk-in customer']
+                );
+                $customerId = $customer->id;
+            }
+
             $sale = Sale::create([
                 'user_id' => auth()->id(),
+                'customer_id' => $customerId,
                 'customer_name' => $validated['customer_name'] ?? null,
                 'customer_phone' => $validated['customer_phone'] ?? null,
                 'subtotal' => $subtotal,

@@ -16,7 +16,7 @@ class StockMovementController extends Controller
                 $query->where('name', 'like', "%{$search}%");
             })
             ->orderBy('name')
-            ->paginate(5)
+            ->paginate(10)
             ->withQueryString();
 
         return view('stock.index', compact('products'));

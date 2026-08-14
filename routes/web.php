@@ -22,7 +22,14 @@ Route::get('/dashboard', function () {
 
     $negativeStockProducts = \App\Models\Product::where('quantity', '<', 0)->get();
 
-    return view('dashboard', compact('negativeStockProducts'));
+    $stats = [
+        'products' => \App\Models\Product::where('status', true)->count(),
+        'customers' => \App\Models\Customer::count(),
+        'todaySales' => \App\Models\Sale::whereDate('created_at', today())->sum('total_amount'),
+        'todayExpenses' => \App\Models\Expense::whereDate('date', today())->sum('amount'),
+    ];
+
+    return view('dashboard', compact('negativeStockProducts', 'stats'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::middleware('auth')->group(function () {
@@ -42,6 +49,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
     Route::middleware('module:customers')->group(function () {
         Route::get('/customers/create', [CustomerController::class, 'create'])->name('customers.create');
+        Route::get('/customers/{customer}', [CustomerController::class, 'show'])->name('customers.show');
         Route::post('/customers', [CustomerController::class, 'store'])->name('customers.store');
         Route::get('/customers/{customer}/edit', [CustomerController::class, 'edit'])->name('customers.edit');
         Route::put('/customers/{customer}', [CustomerController::class, 'update'])->name('customers.update');

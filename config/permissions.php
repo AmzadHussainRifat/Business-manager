@@ -3,7 +3,7 @@
 return [
     'products' => 'admin',
     'customers' => 'staff',
-    'expenses' => 'staff',
+    'expenses' => 'admin',
     'stock' => 'staff',
     'sales' => 'staff',
     'reports' => 'admin',

@@ -9,8 +9,35 @@ class CustomerController extends Controller
 {
     public function index()
     {
-        $customers = Customer::latest()->get();
+        $customers = Customer::withCount('sales')
+            ->withSum('sales', 'total_amount')
+            ->latest()
+            ->get();
+
         return view('customers.index', compact('customers'));
+    }
+
+    public function show(Customer $customer)
+    {
+        $customer->load(['sales' => fn ($q) => $q->with('items')->latest()]);
+
+        $totalSpent = $customer->sales->sum('total_amount');
+        $orderCount = $customer->sales->count();
+        $avgOrderValue = $orderCount > 0 ? $totalSpent / $orderCount : 0;
+        $firstOrder = $customer->sales->sortBy('created_at')->first();
+        $lastOrder = $customer->sales->sortByDesc('created_at')->first();
+
+        $favoriteItem = $customer->sales
+            ->flatMap(fn ($sale) => $sale->items)
+            ->groupBy('product_name')
+            ->map(fn ($items) => $items->sum('quantity'))
+            ->sortDesc()
+            ->keys()
+            ->first();
+
+        return view('customers.show', compact(
+            'customer', 'totalSpent', 'orderCount', 'avgOrderValue', 'firstOrder', 'lastOrder', 'favoriteItem'
+        ));
     }
 
     public function create()

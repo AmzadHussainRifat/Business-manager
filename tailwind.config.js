@@ -8,14 +8,22 @@ export default {
         './storage/framework/views/*.php',
         './resources/views/**/*.blade.php',
     ],
-
     theme: {
         extend: {
+            colors: {
+                paper: '#F2F4F1',
+                ink: '#1F2A37',
+                ledger: '#2B3A67',
+                positive: '#2F5233',
+                negative: '#A6432D',
+                hairline: '#D8D5CC',
+            },
             fontFamily: {
-                sans: ['Figtree', ...defaultTheme.fontFamily.sans],
+                serif: ['Fraunces', ...defaultTheme.fontFamily.serif],
+                sans: ['"IBM Plex Sans"', ...defaultTheme.fontFamily.sans],
+                mono: ['"IBM Plex Mono"', ...defaultTheme.fontFamily.mono],
             },
         },
     },
-
     plugins: [forms],
 };
