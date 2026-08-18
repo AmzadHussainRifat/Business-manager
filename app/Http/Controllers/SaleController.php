@@ -53,7 +53,7 @@ class SaleController extends Controller
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
             'customer_name' => 'nullable|string|max:255',
-            'customer_phone' => 'nullable|string|max:20',
+            'customer_phone' => 'required_with:customer_name|nullable|string|max:20',
             'discount_type' => 'nullable|in:flat,percent',
             'discount_value' => 'nullable|numeric|min:0',
         ]);
@@ -90,9 +90,16 @@ class SaleController extends Controller
             $total = $subtotal - $discountAmount;
 
             $customerId = null;
+            $normalizedPhone = null;
+
             if (! empty($validated['customer_phone'])) {
+                $normalizedPhone = preg_replace('/[^0-9]/', '', $validated['customer_phone']);
+                if (str_starts_with($normalizedPhone, '44')) {
+                    $normalizedPhone = '0' . substr($normalizedPhone, 2);
+                }
+
                 $customer = Customer::firstOrCreate(
-                    ['phone' => $validated['customer_phone']],
+                    ['phone' => $normalizedPhone],
                     ['name' => $validated['customer_name'] ?? 'Walk-in customer']
                 );
                 $customerId = $customer->id;
@@ -102,7 +109,7 @@ class SaleController extends Controller
                 'user_id' => auth()->id(),
                 'customer_id' => $customerId,
                 'customer_name' => $validated['customer_name'] ?? null,
-                'customer_phone' => $validated['customer_phone'] ?? null,
+                'customer_phone' => $normalizedPhone ?? ($validated['customer_phone'] ?? null),
                 'subtotal' => $subtotal,
                 'discount_type' => $discountType,
                 'discount_value' => $discountValue,

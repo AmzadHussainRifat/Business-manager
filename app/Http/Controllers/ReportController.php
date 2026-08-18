@@ -18,6 +18,12 @@ class ReportController extends Controller
         if ($period === 'weekly') {
             $start = Carbon::parse($dateInput)->startOfWeek();
             $end = Carbon::parse($dateInput)->endOfWeek();
+        } elseif ($period === 'monthly') {
+            $start = Carbon::parse($dateInput)->startOfMonth();
+            $end = Carbon::parse($dateInput)->endOfMonth();
+        } elseif ($period === 'yearly') {
+            $start = Carbon::parse($dateInput)->startOfYear();
+            $end = Carbon::parse($dateInput)->endOfYear();
         } else {
             $start = Carbon::parse($dateInput)->startOfDay();
             $end = Carbon::parse($dateInput)->endOfDay();

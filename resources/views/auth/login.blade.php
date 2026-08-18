@@ -1,5 +1,27 @@
 <x-guest-layout>
-    <div x-data="{ selected: null, staffList: {{ $staff->map(fn($s) => ['id' => $s->id, 'name' => $s->name, 'url' => route('staff-login.attempt', $s)])->toJson() }} }">
+    @php
+        $initialSelected = 'null';
+        if ($errors->has('pin') && old('user_id')) {
+            $initialSelected = (int) old('user_id');
+        } elseif ($errors->has('email') || $errors->has('password')) {
+            $initialSelected = "'admin'";
+        }
+    @endphp
+
+    <div x-data="{ showHelp: false }" class="mb-2">
+        <div class="flex justify-end">
+            <button type="button" @click="showHelp = !showHelp"
+                    class="w-6 h-6 flex items-center justify-center rounded-full text-gray-400 hover:text-ink hover:bg-paper text-xs transition"
+                    aria-label="Help">
+                ?
+            </button>
+        </div>
+        <div x-show="showHelp" x-cloak class="p-3 bg-paper border border-hairline rounded-lg text-sm text-ink -mt-1">
+            Tap a name to log in with your PIN, or tap Admin to log in with email and password.
+        </div>
+    </div>
+
+    <div x-data="{ selected: {{ $initialSelected }}, staffList: {{ $staff->map(fn($s) => ['id' => $s->id, 'name' => $s->name, 'url' => route('staff-login.attempt', $s)])->toJson() }} }">
         <div class="grid">
 
             <!-- Picker -->
@@ -54,6 +76,7 @@
 
                     <form method="POST" :action="staffList.find(s => s.id === selected)?.url">
                         @csrf
+                        <input type="hidden" name="user_id" :value="selected">
                         <x-input-label for="pin" value="Enter your 6-digit PIN" />
                         <input
                             type="password"

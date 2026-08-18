@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Expense;
+use App\Models\ExpenseCategory;
 use Illuminate\Http\Request;
 
 class ExpenseController extends Controller
@@ -15,19 +16,27 @@ class ExpenseController extends Controller
 
     public function create()
     {
-        return view('expenses.create');
+        $categories = ExpenseCategory::orderBy('name')->get();
+        return view('expenses.create', compact('categories'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'category' => 'required|string|max:255',
+            'description' => $request->category === 'Other' ? 'required|string|max:255' : 'nullable|string|max:255',
             'amount' => 'required|numeric|min:0',
-            'description' => 'nullable|string|max:255',
             'date' => 'required|date',
+            'receipt' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
 
         $validated['user_id'] = auth()->id();
+
+        if ($request->hasFile('receipt')) {
+            $validated['receipt_path'] = $request->file('receipt')->store('receipts', 'public');
+        }
+        unset($validated['receipt']);
+
         Expense::create($validated);
 
         return redirect()->route('expenses.index')->with('success', 'Expense recorded.');
@@ -35,17 +44,24 @@ class ExpenseController extends Controller
 
     public function edit(Expense $expense)
     {
-        return view('expenses.edit', compact('expense'));
+        $categories = ExpenseCategory::orderBy('name')->get();
+        return view('expenses.edit', compact('expense', 'categories'));
     }
 
     public function update(Request $request, Expense $expense)
     {
         $validated = $request->validate([
             'category' => 'required|string|max:255',
+            'description' => $request->category === 'Other' ? 'required|string|max:255' : 'nullable|string|max:255',
             'amount' => 'required|numeric|min:0',
-            'description' => 'nullable|string|max:255',
             'date' => 'required|date',
+            'receipt' => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120',
         ]);
+
+        if ($request->hasFile('receipt')) {
+            $validated['receipt_path'] = $request->file('receipt')->store('receipts', 'public');
+        }
+        unset($validated['receipt']);
 
         $expense->update($validated);
 

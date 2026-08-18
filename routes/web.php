@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\StockMovementController;
 use App\Http\Controllers\SaleController;
 use App\Http\Controllers\ExpenseController;
+use App\Http\Controllers\ExpenseCategoryController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Auth\StaffLoginController;
 use App\Http\Controllers\SettingsController;
@@ -88,6 +89,10 @@ Route::middleware('auth')->group(function () {
         Route::get('/settings/users/{user}/edit', [SettingsController::class, 'edit'])->name('settings.edit');
         Route::put('/settings/users/{user}', [SettingsController::class, 'update'])->name('settings.update');
         Route::delete('/settings/users/{user}', [SettingsController::class, 'destroy'])->name('settings.destroy');
+
+        Route::get('/settings/categories', [ExpenseCategoryController::class, 'index'])->name('settings.categories.index');
+        Route::post('/settings/categories', [ExpenseCategoryController::class, 'store'])->name('settings.categories.store');
+        Route::delete('/settings/categories/{category}', [ExpenseCategoryController::class, 'destroy'])->name('settings.categories.destroy');
     });
     
 });

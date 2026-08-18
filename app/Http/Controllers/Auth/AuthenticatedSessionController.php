@@ -12,8 +12,12 @@ class AuthenticatedSessionController extends Controller
     /**
      * Display the login view.
      */
-    public function create(): View
+    public function create(): View|RedirectResponse
     {
+        if (User::count() === 0) {
+            return redirect()->route('register');
+        }
+
         $staff = User::where('role', 'staff')->orderBy('name')->get();
         return view('auth.login', compact('staff'));
     }
@@ -34,6 +38,6 @@ class AuthenticatedSessionController extends Controller
         Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('login');
+        return redirect()->route('login');
     }
 }

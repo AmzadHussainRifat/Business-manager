@@ -10,6 +10,8 @@
                         <select name="period" class="border-hairline bg-white text-ink focus:border-ledger focus:ring-ledger rounded-md shadow-sm pl-2 pr-8 py-2">
                             <option value="daily" {{ $period === 'daily' ? 'selected' : '' }}>Daily</option>
                             <option value="weekly" {{ $period === 'weekly' ? 'selected' : '' }}>Weekly</option>
+                            <option value="monthly" {{ $period === 'monthly' ? 'selected' : '' }}>Monthly</option>
+                            <option value="yearly" {{ $period === 'yearly' ? 'selected' : '' }}>Yearly</option>
                         </select>
                     </div>
                     <div>
@@ -20,7 +22,7 @@
                 </form>
 
                 <p class="text-sm text-gray-500 mb-6 font-mono">
-                    Showing: {{ $start->format('M d, Y') }} @if($period === 'weekly') – {{ $end->format('M d, Y') }} @endif
+                    Showing: {{ $start->format('M d, Y') }} @if($period !== 'daily') – {{ $end->format('M d, Y') }} @endif
                 </p>
 
                 <h3 class="font-serif text-lg text-ink mb-3">Financial summary</h3>
@@ -81,7 +83,6 @@
                     </tbody>
                 </table>
 
-                <p class="text-xs text-gray-400 mt-8">Charts and predictive trends planned for a future update.</p>
             </div>
         </div>
     </div>

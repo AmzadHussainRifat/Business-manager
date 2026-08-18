@@ -10,8 +10,10 @@
                     <div class="mb-4 p-3 bg-white border border-negative text-negative rounded-lg">{{ session('error') }}</div>
                 @endif
 
-                <a href="{{ route('settings.create') }}" class="inline-block mb-4 px-4 py-2 bg-ledger text-paper rounded-md hover:bg-ink transition">Add user</a>
-
+                <div class="flex gap-2 mb-4">
+                    <a href="{{ route('settings.create') }}" class="inline-block px-4 py-2 bg-ledger text-paper rounded-md hover:bg-ink transition">Add user</a>
+                    <a href="{{ route('settings.categories.index') }}" class="inline-block px-4 py-2 bg-paper border border-hairline text-ink rounded-md hover:bg-white transition">Manage expense categories</a>
+                </div>
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="border-b border-hairline text-xs uppercase tracking-widest text-gray-500">

@@ -14,7 +14,7 @@
     </head>
     <body class="font-sans text-ink antialiased">
         <div class="min-h-screen flex flex-col justify-center items-center bg-paper">
-            <div class="w-full sm:max-w-md h-[420px] flex flex-col px-6 py-6 bg-white border border-hairline shadow-lg rounded-2xl overflow-hidden transition-[height] duration-200 ease-in-out">
+            <div id="auth-card" class="w-full sm:max-w-md h-[420px] flex flex-col px-6 py-6 bg-white border border-hairline shadow-lg rounded-2xl overflow-hidden transition-[height] duration-200 ease-in-out">
                 <div class="flex-1 overflow-y-auto">
                     {{ $slot }}
                 </div>

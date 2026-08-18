@@ -100,8 +100,9 @@
                                 <input type="text" id="customer_name" name="customer_name" class="w-full border border-hairline rounded-lg p-2 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ledger">
                             </div>
                             <div>
-                                <label for="customer_phone" class="block text-xs text-gray-500 mb-1">Phone</label>
+                                <label for="customer_phone" class="block text-xs text-gray-500 mb-1">Phone <span class="text-gray-400">(required if adding customer details)</span></label>
                                 <input type="text" id="customer_phone" name="customer_phone" class="w-full border border-hairline rounded-lg p-2 min-h-[44px] focus:outline-none focus-visible:ring-2 focus-visible:ring-ledger">
+                                <p id="phone-required-msg" class="hidden text-xs text-negative mt-1">Phone is required to save customer details.</p>
                             </div>
                         </div>
                     </div>
@@ -109,12 +110,12 @@
                     <div class="mb-3 border border-hairline rounded-lg p-3 shrink-0">
                         <p class="font-medium mb-2 text-xs text-gray-500 uppercase tracking-wide">Discount</p>
                         <div class="flex gap-2">
-                            <select id="discount_type" name="discount_type" class="border border-hairline rounded-lg pl-2 pr-8 py-2 min-h-[44px] flex-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ledger">
+                            <select id="discount_type" name="discount_type" form="sale-form" class="border border-hairline rounded-lg pl-2 pr-8 py-2 min-h-[44px] flex-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-ledger">
                                 <option value="">None</option>
                                 <option value="flat">Flat</option>
                                 <option value="percent">%</option>
                             </select>
-                            <input type="number" step="0.01" min="0" id="discount_value" name="discount_value" value="0" class="border border-hairline rounded-lg p-2 min-h-[44px] w-24 focus:outline-none focus-visible:ring-2 focus-visible:ring-ledger">
+                            <input type="number" step="0.01" min="0" id="discount_value" name="discount_value" value="0" form="sale-form" class="border border-hairline rounded-lg p-2 min-h-[44px] w-24 focus:outline-none focus-visible:ring-2 focus-visible:ring-ledger">
                         </div>
                     </div>
 
@@ -152,6 +153,9 @@
         const customerToggle = document.getElementById('customer-info-toggle');
         const customerClose = document.getElementById('customer-info-close');
         const customerBody = document.getElementById('customer-info-body');
+        const customerPhoneInput = document.getElementById('customer_phone');
+        const customerNameInput = document.getElementById('customer_name');
+        const phoneRequiredMsg = document.getElementById('phone-required-msg');
 
         customerToggle.addEventListener('click', function () {
             const isOpen = !customerBody.classList.contains('hidden');
@@ -165,6 +169,13 @@
             customerClose.classList.add('hidden');
             customerClose.classList.remove('flex');
         });
+
+        function clearPhoneError() {
+            customerPhoneInput.classList.remove('border-negative');
+            phoneRequiredMsg.classList.add('hidden');
+        }
+
+        customerPhoneInput.addEventListener('input', clearPhoneError);
 
         document.querySelectorAll('.category-btn').forEach(function (btn) {
             btn.addEventListener('click', function () {
@@ -290,6 +301,22 @@
                 return;
             }
 
+            const nameValue = customerNameInput.value.trim();
+            const phoneValue = customerPhoneInput.value.trim();
+
+            if ((nameValue || phoneValue) && !phoneValue) {
+                e.preventDefault();
+                customerBody.classList.remove('hidden');
+                customerClose.classList.remove('hidden');
+                customerClose.classList.add('flex');
+                customerPhoneInput.classList.add('border-negative');
+                phoneRequiredMsg.classList.remove('hidden');
+                customerPhoneInput.focus();
+                return;
+            }
+
+            clearPhoneError();
+
             const container = document.getElementById('hidden-items-container');
             container.innerHTML = '';
 
@@ -306,9 +333,6 @@
                 qtyInput.value = cart[id].quantity;
                 container.appendChild(qtyInput);
             });
-
-            const nameValue = document.getElementById('customer_name').value;
-            const phoneValue = document.getElementById('customer_phone').value;
 
             const nameInput = document.createElement('input');
             nameInput.type = 'hidden';
