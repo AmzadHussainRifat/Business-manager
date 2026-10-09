@@ -12,9 +12,8 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\Auth\StaffLoginController;
 use App\Http\Controllers\SettingsController;
 
-Route::get('/', function () {
-    return view('welcome');
-});
+// CHANGED: no welcome page on main, go straight to the login page
+Route::redirect('/', '/login');
 
 Route::get('/dashboard', function () {
     if (auth()->user()->role === 'staff') {
@@ -94,11 +93,15 @@ Route::middleware('auth')->group(function () {
         Route::post('/settings/categories', [ExpenseCategoryController::class, 'store'])->name('settings.categories.store');
         Route::delete('/settings/categories/{category}', [ExpenseCategoryController::class, 'destroy'])->name('settings.categories.destroy');
     });
-    
+
 });
 
 require __DIR__.'/auth.php';
 
 Route::get('/staff-login', [StaffLoginController::class, 'index'])->name('staff-login.index');
 Route::get('/staff-login/{user}', [StaffLoginController::class, 'showPin'])->name('staff-login.pin');
-Route::post('/staff-login/{user}', [StaffLoginController::class, 'attempt'])->name('staff-login.attempt');
+
+// CHANGED: limit PIN guesses to 5 per minute per IP
+Route::post('/staff-login/{user}', [StaffLoginController::class, 'attempt'])
+    ->middleware('throttle:5,1')
+    ->name('staff-login.attempt');
